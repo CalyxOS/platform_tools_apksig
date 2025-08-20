@@ -154,6 +154,7 @@ public class ApkSignerTool {
         boolean debuggableApkPermitted = true;
         boolean alignmentPreserved = false;
         int libPageAlignment = LIBRARY_PAGE_ALIGNMENT_BYTES;
+        Integer alignment = null;
         int minSdkVersion = 1;
         boolean minSdkVersionSpecified = false;
         int maxSdkVersion = Integer.MAX_VALUE;
@@ -219,6 +220,9 @@ public class ApkSignerTool {
             } else if ("lib-page-alignment".equals(optionName)) {
                 libPageAlignment = optionsParser.getRequiredIntValue(
                         "Native library page alignment size in bytes");
+            } else if ("alignment-size".equals(optionName) || "a".equals(optionName)) {
+                alignment = optionsParser.getRequiredIntValue(
+                        "Alignment size in bytes");
             } else if ("next-signer".equals(optionName)) {
                 if (!signerParams.isEmpty()) {
                     signers.add(signerParams);
@@ -483,6 +487,7 @@ public class ApkSignerTool {
                         .setMinSdkVersionForRotation(rotationMinSdkVersion)
                         .setRotationTargetsDevRelease(rotationTargetsDevRelease)
                         .setAlignmentPreserved(alignmentPreserved)
+                        .setAlignmentBytes(alignment)
                         .setLibraryPageAlignmentBytes(libPageAlignment);
         if (minSdkVersionSpecified) {
             apkSignerBuilder.setMinSdkVersion(minSdkVersion);

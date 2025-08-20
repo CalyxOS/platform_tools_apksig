@@ -110,6 +110,7 @@ public class ApkSigner {
     private final boolean mOtherSignersSignaturesPreserved;
     private final boolean mAlignmentPreserved;
     private final int mLibraryPageAlignmentBytes;
+    private final Integer mAlignmentBytes;
     private final String mCreatedBy;
 
     private final ApkSignerEngine mSignerEngine;
@@ -146,6 +147,7 @@ public class ApkSigner {
             boolean otherSignersSignaturesPreserved,
             boolean alignmentPreserved,
             int libraryPageAlignmentBytes,
+            Integer alignmentBytes,
             String createdBy,
             ApkSignerEngine signerEngine,
             File inputApkFile,
@@ -176,6 +178,7 @@ public class ApkSigner {
         mOtherSignersSignaturesPreserved = otherSignersSignaturesPreserved;
         mAlignmentPreserved = alignmentPreserved;
         mLibraryPageAlignmentBytes = libraryPageAlignmentBytes;
+        mAlignmentBytes = alignmentBytes;
         mCreatedBy = createdBy;
 
         mSignerEngine = signerEngine;
@@ -811,6 +814,10 @@ public class ApkSigner {
             return 1;
         }
 
+        if (mAlignmentBytes != null) {
+            return mAlignmentBytes.intValue();
+        }
+
         // Attempt to obtain the alignment multiple from the entry's extra field.
         ByteBuffer extra = entry.getExtra();
         if (extra.hasRemaining()) {
@@ -1417,6 +1424,7 @@ public class ApkSigner {
         private boolean mOtherSignersSignaturesPreserved;
         private boolean mAlignmentPreserved = false;
         private int mLibraryPageAlignmentBytes = LIBRARY_PAGE_ALIGNMENT_BYTES;
+        private Integer mAlignmentBytes;
         private String mCreatedBy;
         private Integer mMinSdkVersion;
         private int mRotationMinSdkVersion = V3SchemeConstants.DEFAULT_ROTATION_MIN_SDK_VERSION;
@@ -1912,8 +1920,10 @@ public class ApkSigner {
         /**
          * Sets whether the existing alignment within the APK should be preserved; the
          * default for this setting is false. When this value is false, the value provided to
-         * {@link #setLibraryPageAlignmentBytes(int)} will be used to page align native library
-         * files and 4 bytes will be used to align all other uncompressed files.
+         * {@link #setAlignmentBytes(Integer)}, if any, will be used to align uncompressed file.
+         * If null or none provided, {@link #setLibraryPageAlignmentBytes(int)} will instead be
+         * used to page align native library files and 4 bytes will be used to align all other
+         * uncompressed files.
          */
         public Builder setAlignmentPreserved(boolean alignmentPreserved) {
             mAlignmentPreserved = alignmentPreserved;
@@ -1926,6 +1936,15 @@ public class ApkSigner {
          */
         public Builder setLibraryPageAlignmentBytes(int libraryPageAlignmentBytes) {
             mLibraryPageAlignmentBytes = libraryPageAlignmentBytes;
+            return this;
+        }
+
+        /**
+         * Sets the number of bytes to be used to align uncompressed files in the APK.
+         * If unspecified, will try to determine this.
+         */
+        public Builder setAlignmentBytes(Integer alignmentBytes) {
+            mAlignmentBytes = alignmentBytes;
             return this;
         }
 
@@ -1983,6 +2002,7 @@ public class ApkSigner {
                     mOtherSignersSignaturesPreserved,
                     mAlignmentPreserved,
                     mLibraryPageAlignmentBytes,
+                    mAlignmentBytes,
                     mCreatedBy,
                     mSignerEngine,
                     mInputApkFile,
