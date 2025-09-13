@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Command-line tool for signing APKs and for checking whether an APK's signature are expected to
@@ -72,6 +73,7 @@ public class ApkSignerTool {
     private static MessageDigest sha256 = null;
     private static MessageDigest sha1 = null;
     private static MessageDigest md5 = null;
+    private static SignerParams lastSignerParams = null;
 
     private static final List<Provider> installedProviders = new ArrayList<>();
 
@@ -90,6 +92,38 @@ public class ApkSignerTool {
         addProviders();
         // END-AOSP
 
+        String cmd = params[0];
+        try {
+            if ("batch".equals(cmd)) {
+                Scanner scanner = new Scanner(System.in);
+                scanner.useDelimiter("\0");
+                while (scanner.hasNext()) {
+                    final int argsLen = scanner.nextInt();
+                    if (argsLen == 0) {
+                        return;
+                    }
+                    if (argsLen > 4096) {
+                        System.exit(1);
+                    }
+                    final String[] args = new String[argsLen];
+                    for (int i = 0; i < argsLen; i++) {
+                        if (!scanner.hasNext()) {
+                            return;
+                        }
+                        args[i] = scanner.next();
+                    }
+                    processCommandLine(args);
+                    System.out.print("\0");
+                }
+            } else {
+                processCommandLine(params);
+            }
+        } finally {
+            finalizeProviders();
+        }
+    }
+
+    public static void processCommandLine(String[] params) throws Exception {
         String cmd = params[0];
         try {
             if ("sign".equals(cmd)) {
@@ -118,8 +152,6 @@ public class ApkSignerTool {
             System.err.println(e.getMessage());
             System.exit(1);
             return;
-        } finally {
-            finalizeProviders();
         }
     }
 
@@ -471,7 +503,8 @@ public class ApkSignerTool {
     private static ApkSigner.SignerConfig getSignerConfig(SignerParams signer,
             PasswordRetriever passwordRetriever, boolean deterministicDsaSigning) {
         try {
-            signer.loadPrivateKeyAndCerts(passwordRetriever);
+            signer.loadPrivateKeyAndCerts(lastSignerParams, passwordRetriever);
+            lastSignerParams = signer;
         } catch (ParameterException e) {
             System.err.println(
                     "Failed to load signer \"" + signer.getName() + "\": " + e.getMessage());
