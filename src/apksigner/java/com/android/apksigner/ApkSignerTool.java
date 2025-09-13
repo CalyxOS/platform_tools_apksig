@@ -33,7 +33,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.StringWriter;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Command-line tool for signing APKs and for checking whether an APK's signature are expected to
@@ -72,6 +75,7 @@ public class ApkSignerTool {
     private static MessageDigest sha256 = null;
     private static MessageDigest sha1 = null;
     private static MessageDigest md5 = null;
+    private static SignerParams lastSignerParams = null;
 
     private static final List<Provider> installedProviders = new ArrayList<>();
 
@@ -90,6 +94,49 @@ public class ApkSignerTool {
         addProviders();
         // END-AOSP
 
+        String cmd = params[0];
+        try {
+            if ("batch".equals(cmd)) {
+                Scanner scanner = new Scanner(System.in);
+                scanner.useDelimiter("\0");
+                while (scanner.hasNext()) {
+                    final int argsLen = scanner.nextInt();
+                    if (argsLen == 0) {
+                        return;
+                    }
+                    if (argsLen > 4096) {
+                        System.exit(1);
+                    }
+                    final String[] args = new String[argsLen];
+                    for (int i = 0; i < argsLen; i++) {
+                        args[i] = scanner.next();
+                    }
+                    try {
+                        processCommandLine(args);
+                        System.out.print("\0RETURN:0\0");
+                        System.out.flush();
+                        System.err.print("\0RETURN:0\0");
+                        System.err.flush();
+                    } catch (Exception e) {
+                        logException(e);
+                        System.out.print("\0RETURN:1\0");
+                        System.out.flush();
+                        System.err.print("\0RETURN:1\0");
+                        System.err.flush();
+                    }
+                }
+            } else {
+                processCommandLine(params);
+            }
+        } catch (Exception e) {
+            logException(e);
+            System.exit(1);
+        } finally {
+            finalizeProviders();
+        }
+    }
+
+    public static void processCommandLine(String[] params) throws Exception {
         String cmd = params[0];
         try {
             if ("sign".equals(cmd)) {
@@ -116,11 +163,15 @@ public class ApkSignerTool {
             }
         } catch (ParameterException | OptionsParser.OptionsException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
             return;
-        } finally {
-            finalizeProviders();
         }
+    }
+
+    public static void logException(Exception e) {
+        final StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        System.err.println(e.getMessage());
+        System.err.println("EXCEPTION: " + stringWriter);
     }
 
     private static void finalizeProviders() {
@@ -471,7 +522,8 @@ public class ApkSignerTool {
     private static ApkSigner.SignerConfig getSignerConfig(SignerParams signer,
             PasswordRetriever passwordRetriever, boolean deterministicDsaSigning) {
         try {
-            signer.loadPrivateKeyAndCerts(passwordRetriever);
+            signer.loadPrivateKeyAndCerts(lastSignerParams, passwordRetriever);
+            lastSignerParams = signer;
         } catch (ParameterException e) {
             System.err.println(
                     "Failed to load signer \"" + signer.getName() + "\": " + e.getMessage());
