@@ -73,6 +73,8 @@ public class ApkSignerTool {
     private static MessageDigest sha1 = null;
     private static MessageDigest md5 = null;
 
+    private static final List<Provider> installedProviders = new ArrayList<>();
+
     public static final int ZIP_MAGIC = 0x04034b50;
 
     public static void main(String[] params) throws Exception {
@@ -116,6 +118,18 @@ public class ApkSignerTool {
             System.err.println(e.getMessage());
             System.exit(1);
             return;
+        } finally {
+            finalizeProviders();
+        }
+    }
+
+    private static void finalizeProviders() {
+        for (Provider provider : installedProviders) {
+            try {
+                if ("sun.security.pkcs11.SunPKCS11".equals(provider.getClass().getName())) {
+                    provider.getClass().getMethod("logout").invoke(provider);
+                }
+            } catch (Exception ignored) { }
         }
     }
 
@@ -384,7 +398,7 @@ public class ApkSignerTool {
 
         // Install additional JCA Providers
         for (ProviderInstallSpec providerInstallSpec : providers) {
-            providerInstallSpec.installProvider();
+            installedProviders.add(providerInstallSpec.installProvider());
         }
 
         ApkSigner.SignerConfig sourceStampSignerConfig = null;
@@ -985,7 +999,7 @@ public class ApkSignerTool {
 
         // Install additional JCA Providers
         for (ProviderInstallSpec providerInstallSpec : providers) {
-            providerInstallSpec.installProvider();
+            installedProviders.add(providerInstallSpec.installProvider());
         }
 
         try (PasswordRetriever passwordRetriever = new PasswordRetriever()) {
@@ -1392,7 +1406,7 @@ public class ApkSignerTool {
             return (className == null) && (constructorParam == null) && (position == null);
         }
 
-        private void installProvider() throws Exception {
+        private Provider installProvider() throws Exception {
             if (className == null) {
                 throw new ParameterException(
                         "JCA Provider class name (--provider-class) must be specified");
@@ -1429,6 +1443,8 @@ public class ApkSignerTool {
             } else {
                 Security.insertProviderAt(provider, position);
             }
+
+            return provider;
         }
     }
 
