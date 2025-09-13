@@ -47,6 +47,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.crypto.EncryptedPrivateKeyInfo;
@@ -81,6 +82,9 @@ public class SignerParams {
 
     private String v1SigFileBasename;
 
+    private KeyStore mKeyStore;
+    private List<char[]> mKeystorePasswords;
+    private Charset[] mAdditionalPasswordEncodings;
     private KeyConfig mKeyConfig;
     private List<X509Certificate> certs;
     private final SignerCapabilities.Builder signerCapabilitiesBuilder =
@@ -170,6 +174,15 @@ public class SignerParams {
         this.v1SigFileBasename = v1SigFileBasename;
     }
 
+    public boolean matchesKeystoreSettings(SignerParams other) {
+        return Objects.equals(keystoreFile, other.keystoreFile) &&
+                Objects.equals(keystorePasswordSpec, other.keystorePasswordSpec) &&
+                Objects.equals(keystoreProviderName, other.keystoreProviderName) &&
+                Objects.equals(keystoreProviderClass, other.keystoreProviderClass) &&
+                Objects.equals(keystoreProviderArg, other.keystoreProviderArg) &&
+                Objects.equals(mKmsType, other.mKmsType);
+    }
+
     /**
      * Returns the signing key of this signer.
      *
@@ -237,6 +250,24 @@ public class SignerParams {
                 && (mKmsKeyAlias == null);
     }
 
+    public boolean loadPrivateKeyAndCerts(
+            SignerParams signerWithMaybeAlreadyLoadedKeyStore,
+            PasswordRetriever passwordRetriever
+    ) throws Exception {
+        if (signerWithMaybeAlreadyLoadedKeyStore != null
+                && matchesKeystoreSettings(signerWithMaybeAlreadyLoadedKeyStore)
+                && signerWithMaybeAlreadyLoadedKeyStore.mKeyStore != null) {
+            mKeyStore = signerWithMaybeAlreadyLoadedKeyStore.mKeyStore;
+            mAdditionalPasswordEncodings =
+                    signerWithMaybeAlreadyLoadedKeyStore.mAdditionalPasswordEncodings;
+            mKeystorePasswords = signerWithMaybeAlreadyLoadedKeyStore.mKeystorePasswords;
+            loadPrivateKeyAndCertsFromLoadedKeyStore(passwordRetriever);
+            return true;
+        }
+        loadPrivateKeyAndCerts(passwordRetriever);
+        return false;
+    }
+
     public void loadPrivateKeyAndCerts(PasswordRetriever passwordRetriever) throws Exception {
         if (mKmsType != null) {
             if (mKmsKeyAlias == null) {
@@ -272,12 +303,17 @@ public class SignerParams {
                         + " (--kms-key-alias and --kms-type) must be specified");
     }
 
-    private void loadPrivateKeyAndCertsFromKeyStore(PasswordRetriever passwordRetriever)
-            throws Exception {
+    private void loadPrivateKeyAndCertsFromKeyStore(
+            PasswordRetriever passwordRetriever
+    ) throws Exception {
         if (keystoreFile == null) {
             throw new ParameterException("KeyStore (--ks) must be specified");
         }
+        loadKeyStore(passwordRetriever);
+        loadPrivateKeyAndCertsFromLoadedKeyStore(passwordRetriever);
+    }
 
+    private void loadKeyStore(PasswordRetriever passwordRetriever) throws Exception {
         // 1. Obtain a KeyStore implementation
         String ksType = (keystoreType != null) ? keystoreType : KeyStore.getDefaultType();
         KeyStore ks;
@@ -318,21 +354,27 @@ public class SignerParams {
         }
 
         // 2. Load the KeyStore
-        List<char[]> keystorePasswords;
-        Charset[] additionalPasswordEncodings;
         {
             String keystorePasswordSpec =
                     (this.keystorePasswordSpec != null)
                             ? this.keystorePasswordSpec
                             : PasswordRetriever.SPEC_STDIN;
-            additionalPasswordEncodings =
+            mAdditionalPasswordEncodings =
                     (passwordCharset != null) ? new Charset[] {passwordCharset} : new Charset[0];
-            keystorePasswords =
+            mKeystorePasswords =
                     passwordRetriever.getPasswords(keystorePasswordSpec,
-                            "Keystore password for " + name, additionalPasswordEncodings);
+                            "Keystore password for " + name, mAdditionalPasswordEncodings);
             loadKeyStoreFromFile(
-                    ks, "NONE".equals(keystoreFile) ? null : keystoreFile, keystorePasswords);
+                    ks, "NONE".equals(keystoreFile) ? null : keystoreFile, mKeystorePasswords);
         }
+
+        mKeyStore = ks;
+    }
+
+    private void loadPrivateKeyAndCertsFromLoadedKeyStore(
+            PasswordRetriever passwordRetriever
+    ) throws Exception {
+        final KeyStore ks = mKeyStore;
 
         // 3. Load the PrivateKey and cert chain from KeyStore
         String keyAlias = null;
@@ -378,7 +420,7 @@ public class SignerParams {
                         passwordRetriever.getPasswords(
                                 keyPasswordSpec,
                                 "Key \"" + keyAlias + "\" password for " + name,
-                                additionalPasswordEncodings);
+                                mAdditionalPasswordEncodings);
                 entryKey = getKeyStoreKey(ks, keyAlias, keyPasswords);
             } else {
                 // Key password spec is not specified. This means we should assume that key
@@ -386,13 +428,13 @@ public class SignerParams {
                 // wrong, we should prompt for key password and retry loading the key using that
                 // password.
                 try {
-                    entryKey = getKeyStoreKey(ks, keyAlias, keystorePasswords);
+                    entryKey = getKeyStoreKey(ks, keyAlias, mKeystorePasswords);
                 } catch (UnrecoverableKeyException expected) {
                     List<char[]> keyPasswords =
                             passwordRetriever.getPasswords(
                                     PasswordRetriever.SPEC_STDIN,
                                     "Key \"" + keyAlias + "\" password for " + name,
-                                    additionalPasswordEncodings);
+                                    mAdditionalPasswordEncodings);
                     entryKey = getKeyStoreKey(ks, keyAlias, keyPasswords);
                 }
             }
@@ -419,6 +461,7 @@ public class SignerParams {
                             + ". Wrong password?",
                     e);
         }
+        this.mKeyStore = ks;
         this.mKeyConfig = new KeyConfig.Jca(key);
         Certificate[] certChain = ks.getCertificateChain(keyAlias);
         if ((certChain == null) || (certChain.length == 0)) {
