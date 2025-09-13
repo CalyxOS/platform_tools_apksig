@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4010d5e_3bdb3af9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2025-09-13T22:23:55Z",
+      "side": 1,
+      "message": "https://docs.yubico.com/hardware/yubihsm-2/hsm-2-user-guide/hsm2-core-concepts.html#session\n\n30 second expiration, but don\u0027t need to wait if you just end the session properly.",
+      "revId": "ea27c2b1c84e5349137eb740771456cee8dc4eb0",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
