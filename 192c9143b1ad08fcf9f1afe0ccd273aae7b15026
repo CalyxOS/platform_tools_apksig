@@ -34,6 +34,24 @@
       "parentUuid": "66d42a1b_4731215a",
       "revId": "192c9143b1ad08fcf9f1afe0ccd273aae7b15026",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5486974b_9c7ae934",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2025-09-16T19:46:44Z",
+      "side": 1,
+      "message": "There\u0027s some other tedious backstory in #3417 which I just added to the commit message.",
+      "parentUuid": "4e50cf3c_51e06d04",
+      "revId": "192c9143b1ad08fcf9f1afe0ccd273aae7b15026",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }
