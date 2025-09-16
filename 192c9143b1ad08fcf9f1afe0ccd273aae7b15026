@@ -16,6 +16,24 @@
       "message": "Do you know why this wasn\u0027t needed for how we signed before? What has changed that made this necessary?",
       "revId": "192c9143b1ad08fcf9f1afe0ccd273aae7b15026",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e50cf3c_51e06d04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2025-09-16T19:44:48Z",
+      "side": 1,
+      "message": "The AOSP build process doesn\u0027t use apksigner, it uses signapk. Switching it to use apksigner is a custom change for our purposes.\n\nsignapk was failing with YubiHSM 2 due to session exhaustion that I couldn\u0027t overcome, but apksigner has been a viable alternative, except for this.",
+      "parentUuid": "66d42a1b_4731215a",
+      "revId": "192c9143b1ad08fcf9f1afe0ccd273aae7b15026",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }
