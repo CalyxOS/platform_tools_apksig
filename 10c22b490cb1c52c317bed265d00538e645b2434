@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dafb39b0_c8444280",
+        "filename": "src/main/java/com/android/apksig/ApkSigner.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2025-09-25T17:07:58Z",
+      "side": 1,
+      "message": "This is where the actual functional change lies. It returns early here and just returns the requested  alignment.",
+      "revId": "10c22b490cb1c52c317bed265d00538e645b2434",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
