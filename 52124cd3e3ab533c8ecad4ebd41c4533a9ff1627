@@ -16,6 +16,24 @@
       "message": "Reflection may not be needed if someone figures out how to get the AOSP build process to be able to access this class.",
       "revId": "52124cd3e3ab533c8ecad4ebd41c4533a9ff1627",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd422b17_42c326c0",
+        "filename": "src/apksigner/java/com/android/apksigner/ApkSignerTool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2025-11-21T13:02:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "384c8f59_605dceb1",
+      "revId": "52124cd3e3ab533c8ecad4ebd41c4533a9ff1627",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }
