@@ -16,6 +16,24 @@
       "message": "Change only for performance improvement. Update commit subject / message?\n\nHowever, if not used, other YubiHSM vendor scripts will need to be adapted to stop using apksigner in batch mode.",
       "revId": "9ec01927ee41bfa19a689f3805f64d5154795a6a",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df9e96f4_e1a7433e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2025-11-21T13:02:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "23b30e89_99dbd309",
+      "revId": "9ec01927ee41bfa19a689f3805f64d5154795a6a",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }
