@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79345d9e_7aad9cc9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2025-12-11T14:03:26Z",
+      "side": 1,
+      "message": "LGTM\n\nFYI I\u0027m the maintainer of _apksigner_ in Debian.  When you\u0027ve merged this and it has been tested on a Nitrokey or two, then I would consider including this as a patch in the Debian package.  Of course, I hope it gets upstreamed as well.  I have a couple different Nitrokeys that I could test with.",
+      "revId": "12a329fefe23b4abe5879a5078311e9fb00b48b9",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
