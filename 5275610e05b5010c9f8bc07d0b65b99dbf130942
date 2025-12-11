@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83d0cae1_6229b233",
+        "filename": "src/apksigner/java/com/android/apksigner/ApkSignerTool.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2025-12-11T13:58:04Z",
+      "side": 1,
+      "message": "```suggestion\n            } else if (\"alignment-size\".equals(optionName) || \"a\".equals(optionName)) {\n```\n\nSince there are multiple alignment options, maybe more specific makes sense?",
+      "revId": "5275610e05b5010c9f8bc07d0b65b99dbf130942",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
