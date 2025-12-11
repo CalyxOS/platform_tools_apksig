@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2c275da_889af310",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2025-12-11T14:08:17Z",
+      "side": 1,
+      "message": "Nice feature!  I\u0027ve also seen that some Nitrokeys can be quite slow to load.  As with other things, I would consider this as a patch for the apksigner Debian package, and I hope it\u0027ll get upstreamed.  This one seems more likely to have security issues than your other patches I\u0027ve looked at.  Ideally, there could be some kind of audit on it.",
+      "revId": "391b20b75c737afe7d2ed1400d95641468cfedbb",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
