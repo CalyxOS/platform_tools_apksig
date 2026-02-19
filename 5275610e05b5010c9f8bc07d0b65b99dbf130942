@@ -16,6 +16,24 @@
       "message": "```suggestion\n            } else if (\"alignment-size\".equals(optionName) || \"a\".equals(optionName)) {\n```\n\nSince there are multiple alignment options, maybe more specific makes sense?",
       "revId": "5275610e05b5010c9f8bc07d0b65b99dbf130942",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94410c35_1c1e6214",
+        "filename": "src/apksigner/java/com/android/apksigner/ApkSignerTool.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2026-02-19T22:22:59Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "83d0cae1_6229b233",
+      "revId": "5275610e05b5010c9f8bc07d0b65b99dbf130942",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }
